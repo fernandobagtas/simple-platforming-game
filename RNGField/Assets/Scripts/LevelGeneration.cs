@@ -1,3 +1,12 @@
+/* V1 of the level generator script
+ * REDUNDANT
+ * 
+ * 
+ * This spawns a random game object in a pre-designated spawn point.
+ * You need to make a number of spawn points beforehand for this to work, and if you want to coordinate the spawns, each one will need to know what was spawned by the one before but it can't do that
+ */
+
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

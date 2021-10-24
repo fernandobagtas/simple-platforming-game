@@ -16,7 +16,8 @@ public class Player : MonoBehaviour
     private Rigidbody rigidbodyComponent;
 
     private int superJumpsRemaining;
-    private int doubleJumpsRemaining;
+    //private int doubleJumpsRemaining;
+    private bool doubleJump = true;
 
     // Start is called before the first frame update
     void Start()
@@ -43,21 +44,29 @@ public class Player : MonoBehaviour
         rigidbodyComponent.velocity = new Vector3(horizontalInput * 2, rigidbodyComponent.velocity.y, 0);
         //Debug.Log(rigidbodyComponent.velocity);
 
+        //Checks if the groundCheckTransform on the player is colliding with another layer. Note that it checks the bottommost part of the player only
+        int playerOverlapCheck = Physics.OverlapSphere(groundCheckTransform.position, 0.1f, playerMask).Length;
+
         //Check if the player's feet is not colliding with any layer that's not the player or equipments (AKA in the air) 
-        if (Physics.OverlapSphere(groundCheckTransform.position, 0.1f, playerMask).Length == 0)
+        if (playerOverlapCheck == 0)
         {
-            
+            //Check if the player can still double jump (AKA have double jump tokens left)
             //Debug.Log("doubleJumpsRemaining = " + doubleJumpsRemaining);
-            if (doubleJumpsRemaining == 0)
+            //if (doubleJumpsRemaining == 0)
+            //{
+            //    return;
+            //}
+            //else { }
+
+            if (!doubleJump)
             {
                 return;
             }
-            else { }
         }
 
         if (SpaceKeyPressed)
         {
-            Debug.Log("space pressed. Velocity:" + ForceMode.VelocityChange);
+            //Debug.Log("space pressed. Velocity:" + ForceMode.VelocityChange);
 
 
             //jump force
@@ -68,9 +77,10 @@ public class Player : MonoBehaviour
                 superJumpsRemaining--;
             }
 
-            if (Physics.OverlapSphere(groundCheckTransform.position, 0.1f, playerMask).Length == 0 && doubleJumpsRemaining > 0)
+            if (playerOverlapCheck == 0)
             {
-                doubleJumpsRemaining--;
+                //doubleJumpsRemaining--;
+                doubleJump = false;
                 rigidbodyComponent.velocity = new Vector3(rigidbodyComponent.velocity.x, 0); //reset y velocity to 0 so the jump doesn't get affected by any existing forces like gravity
             }
 
@@ -78,30 +88,37 @@ public class Player : MonoBehaviour
             rigidbodyComponent.AddForce(Vector3.up * jumpPower, ForceMode.VelocityChange);
             SpaceKeyPressed = false;
         }
-    }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        //Coin layer = 6
-        //if player collides with coin, destroy coin and increase super jump instance
-        switch (other.gameObject.layer)
+        //Debug.Log("Overlap: " + playerOverlapCheck);
+        //Check if player is colliding with the ground layer, or any layer in fact (Player is on the ground)
+        if (playerOverlapCheck > 0)
         {
-            //Coin layer = 6
-            //if player collides with coin, destroy coin and increase super jump instance
-            case 6:
-                Destroy(other.gameObject);
-                superJumpsRemaining++;
-                break;
-
-            //Orb layer = 7
-            //if player collides with orb, destroy orb and increase double jump instance
-            case 7:
-                Destroy(other.gameObject);
-                doubleJumpsRemaining++;
-                break;
-
-            default:
-                break;
+            doubleJump = true;
         }
     }
+
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    //Coin layer = 6
+    //    //if player collides with coin, destroy coin and increase super jump instance
+    //    switch (other.gameObject.layer)
+    //    {
+    //        //Coin layer = 6
+    //        //if player collides with coin, destroy coin and increase super jump instance
+    //        case 6:
+    //            Destroy(other.gameObject);
+    //            superJumpsRemaining++;
+    //            break;
+
+    //        //Orb layer = 7
+    //        //if player collides with orb, destroy orb and increase double jump instance
+    //        case 7:
+    //            Destroy(other.gameObject);
+    //            doubleJumpsRemaining++;
+    //            break;
+
+    //        default:
+    //            break;
+    //    }
+    //}
 }
